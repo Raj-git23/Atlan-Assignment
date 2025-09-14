@@ -233,7 +233,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                   <p className="font-medium">Select Date & Slot(s)</p>
                   <div className="flex flex-col gap-3">
                     {selectedDays.includes("saturday") && (
-                      <div className="flex gap-3 items-center">
+                      <div className="flex  gap-3 items-center">
                         <SatSunDropdown
                           sat={true}
                           sun={false}
@@ -241,6 +241,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                           onChange={(date) =>
                             handleDateChange("saturday", date)
                           }
+                          className="w-auto flex-1"
                         />
                         <DropdownFilter
                           filterLabel="Slots"
@@ -250,7 +251,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                           handleChange={(slot) =>
                             handleTimeChange("saturday", slot)
                           }
-                          className="border border-muted-foreground"
+                          className="!w-fit !sm:w-[200px] border border-muted-foreground"
                         />
                       </div>
                     )}
@@ -264,6 +265,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                           onChange={(date) =>
                             handleDateChange("sunday", date)
                           }
+                          className="w-auto flex-1"
                         />
                         <DropdownFilter
                           filterLabel="Slots"
@@ -273,7 +275,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                           handleChange={(slot) =>
                             handleTimeChange("sunday", slot)
                           }
-                          className="border border-muted-foreground"
+                          className="!w-fit !sm:w-12 border border-muted-foreground"
                         />
                       </div>
                     )}
@@ -286,9 +288,9 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
               {/* Date Range Flow */}
               <div className="p-4 bg-secondary/20 rounded-lg space-y-3">
                 {/* <p className="font-semibold">Select Start & End Dates</p> */}
-                <div className="flex gap-4 justify-between px-2">
+                <div className="flex gap-4 justify-around px-2">
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium">Start Date</label>
+                    <label className="text-sm font-medium pl-2">Start Date</label>
                     <Input
                       type="date"
                       value={dateRange.startDate}
@@ -301,7 +303,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium">End Date</label>
+                    <label className="text-sm font-medium pl-2">End Date</label>
                     <Input
                       type="date"
                       value={dateRange.endDate}
