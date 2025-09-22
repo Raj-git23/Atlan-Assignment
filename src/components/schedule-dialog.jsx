@@ -297,7 +297,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                     />
                   </div>
 
-                  <Calendar />
+                  {/* <Calendar /> */}
                 </div>
               </div>
             </>
