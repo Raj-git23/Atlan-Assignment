@@ -7,7 +7,7 @@ import {
   colors,
   animals,
 } from "unique-names-generator";
-import { User } from "lucide-react";
+import { CalendarRange, User } from "lucide-react";
 import { themes } from "@/assets/themes";
 
 const Navbar = () => {
@@ -64,19 +64,19 @@ const Navbar = () => {
     <>
       <main className="flex justify-between items-center px-3 sm:px-6 lg:px-20 py-4 border-b">
         <div className="flex w-full gap-1 sm:gap-4 items-center">
-          <picture className="h-16 w-16 overflow-hidden">
+          {/* <picture className="h-16 w-16 overflow-hidden">
             <img
               src="/logo.png"
               alt="logo"
               className="object-cover h-full w-full mix-blend-hard-light"
             />
-          </picture>
-
+          </picture> */}
+          <div className="bg-primary/50 p-2 rounded-xl"> <CalendarRange size={30} className="text-accent-foreground"/></div>
           <div className="flex flex-col text-primary">
             <p className="text-2xl sm:text-3xl font-bold tracking-tight">
               Weekendly
             </p>
-            <p className="text-sm font-light opacity-80">Plan your perfect weekend</p>
+            <p className="text-sm font-normal opacity-80 text-foreground">Plan your perfect weekend</p>
           </div>
         </div>
 
