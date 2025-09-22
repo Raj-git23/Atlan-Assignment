@@ -27,3 +27,25 @@ export const getButtonVariant = ({ isScheduled, isInSelectedActivities }) => {
     return "default";
   }
 };
+
+
+export function getUpcomingDay(targetDay) {
+  const today = new Date();
+  const target = targetDay.toLowerCase() === "saturday" ? 6 : 0; // 0=Sunday, 6=Saturday
+  const current = today.getDay();
+
+  // Calculate days until the target (wraps around the week)
+  const diff = (target - current + 7) % 7;
+  const daysToAdd = diff === 0 ? 0 : diff;
+
+  const result = new Date(today);
+  result.setDate(today.getDate() + daysToAdd);
+
+  // Format YYYY-MM-DD
+  const year = result.getFullYear();
+  const month = String(result.getMonth() + 1).padStart(2, "0");
+  const day = String(result.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+

@@ -51,8 +51,8 @@ const ActivityCard = ({ activity, index }) => {
       <Card
         key={activity?.id}
         className={`cursor-pointer flex flex-col gap-2 pb-4 pt-0 transition-all overflow-hidden duration-300 hover:shadow-xl hover:scale-[1.02] group
-                    ${isScheduled ? "ring-2 ring-primary/50 shadow-lg bg-primary/10" : ""}
-                    ${isInSelectedActivities && !isScheduled ? "ring-1 ring-secondary-foreground/20 bg-muted" : ""}
+                    ${isScheduled ? "ring-2 ring-primary/60 shadow-lg bg-primary/10" : ""}
+                    ${isInSelectedActivities && !isScheduled ? "ring-1 ring-secondary-foreground/40 bg-muted" : ""}
                   `}
         style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
         onClick={handleButtonClick}

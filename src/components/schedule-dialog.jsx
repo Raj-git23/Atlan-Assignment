@@ -16,9 +16,11 @@ import DropdownFilter from "./dropdownfilter";
 import SatSunDropdown from "./plannedSatSunDropdown";
 import { Input } from "@/components/ui/input"; 
 import * as LucideIcons from "lucide-react";
+import { Calendar, CalendarDayButton } from "./ui/calendar";
 
 const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
   const ActivityIcon = LucideIcons[activity?.icon];
+  const [error, setError] = useState("");
 
   // Normal weekend flow
   const [selectedDays, setSelectedDays] = useState(Array.isArray(day) ? day : []);
@@ -31,18 +33,9 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
 
   // New toggle & date range flow
   const [useDateRange, setUseDateRange] = useState(false);
-  const [dateRange, setDateRange] = useState({
-    startDate: "",
-    endDate: ""
-  });
+  const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
-  const [error, setError] = useState("");
-
-  const {
-    scheduleActivity,
-    addActivity,
-    getScheduledActivitiesForDay
-  } = useActivityStore();
+  const { scheduleActivity, addActivity, getScheduledActivitiesForDay } = useActivityStore();
 
   // Existing handlers
   const handleDayToggle = (day) => {
@@ -64,8 +57,11 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
     setError("");
   };
 
+
+  // To save the activity
   const handleSubmit = () => {
-    if (useDateRange) {
+
+    if (useDateRange) {         // If its a long weekend
       if (!dateRange.startDate || !dateRange.endDate) {
         setError("Please select both start and end dates");
         return;
@@ -74,12 +70,14 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
       addActivity(activity);
       scheduleActivity({
         activity,
-        day: "dateRange",
+        day: "daterange",
         time: "",
         date: "",
-        dateRange, // ✅ pass startDate & endDate
+        dateRange, // pass startDate & endDate
+        type: useDateRange ? "range" : "single",    // Identify long or single weekend
       });
-    } else {
+
+    } else {        // for weekends only
       if (selectedDays.length === 0) {
         setError("Please select at least one day");
         return;
@@ -90,18 +88,14 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
           setError(`Please select a date for ${d}`);
           return;
         }
-        if (
-          !selectedSlots[`${d}Time`] ||
-          selectedSlots[`${d}Time`] === "00:00 AM"
-        ) {
+        if (!selectedSlots[`${d}Time`] || selectedSlots[`${d}Time`] === "00:00 AM") {
           setError(`Please select a time slot for ${d}`);
           return;
         }
 
         const dayActivities = getScheduledActivitiesForDay(d);
-        const isAlreadyScheduled = dayActivities.some(
-          (sa) => sa.activity.id === activity.id
-        );
+        const isAlreadyScheduled = dayActivities.some((sa) => sa.activity?.id === activity?.id);
+        
         if (isAlreadyScheduled) {
           setError(`Activity is already scheduled for ${d}`);
           return;
@@ -116,6 +110,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
           day: d,
           time: selectedSlots[`${d}Time`],
           date: selectedSlots[`${d}Date`],
+          type: useDateRange ? "range" : "single",    // Identify long or single weekend
         });
       });
     }
@@ -187,23 +182,18 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
             <>
               {/* Weekend Selection Flow */}
               <div className="space-y-3">
-                <p className="font-semibold text-gray-800">
-                  Choose day(s) for this activity:
-                </p>
+                <p className="font-semibold text-gray-800"> Choose day(s) for this activity: </p>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Saturday */}
                   <div
                     onClick={() => handleDayToggle("saturday")}
-                    className={`relative p-4 h-32 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] ${selectedDays.includes("saturday")
-                        ? "bg-primary/10 border-primary shadow-md"
-                        : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                      }`}
+                    className={`relative p-4 h-32 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
+                      ${selectedDays.includes("saturday") ? "bg-primary/10 border-primary shadow-md" : "bg-secondary/10 border-secondary hover:bg-secondary/30" }`}
                   >
                     <div className="flex flex-col text-center">
                       <span className="font-semibold text-lg">Saturday</span>
-                      <span className="text-sm text-gray-500">
-                        {saturdayCount}{" "}
-                        {saturdayCount === 1 ? "activity" : "activities"} planned
+                      <span className="text-sm text-secondary-foreground/80">
+                        {saturdayCount} {saturdayCount === 1 ? "activity" : "activities"} planned
                       </span>
                     </div>
                   </div>
@@ -211,16 +201,13 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                   {/* Sunday */}
                   <div
                     onClick={() => handleDayToggle("sunday")}
-                    className={`relative p-4 h-32 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] ${selectedDays.includes("sunday")
-                        ? "bg-primary/10 border-primary shadow-md"
-                        : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                      }`}
+                    className={`relative p-4 h-32 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
+                      ${selectedDays.includes("sunday") ? "bg-primary/10 border-primary shadow-md" : "bg-secondary/10 border-secondary hover:bg-secondary/30" }`}
                   >
                     <div className="flex flex-col text-center">
                       <span className="font-semibold text-lg">Sunday</span>
-                      <span className="text-sm text-gray-500">
-                        {sundayCount}{" "}
-                        {sundayCount === 1 ? "activity" : "activities"} planned
+                      <span className="text-sm text-secondary-foreground/80">
+                        {sundayCount} {sundayCount === 1 ? "activity" : "activities"} planned
                       </span>
                     </div>
                   </div>
@@ -232,15 +219,14 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                 <div className="flex flex-col gap-3 p-4 bg-secondary/20 rounded-lg">
                   <p className="font-medium">Select Date & Slot(s)</p>
                   <div className="flex flex-col gap-3">
+                    
                     {selectedDays.includes("saturday") && (
                       <div className="flex  gap-3 items-center">
                         <SatSunDropdown
                           sat={true}
                           sun={false}
                           value={selectedSlots.saturdayDate}
-                          onChange={(date) =>
-                            handleDateChange("saturday", date)
-                          }
+                          onChange={(date) => handleDateChange("saturday", date)}
                           className="w-auto flex-1"
                         />
                         <DropdownFilter
@@ -248,9 +234,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                           filterValues={timeSlots}
                           defaultValue="00:00 AM"
                           value={selectedSlots.saturdayTime}
-                          handleChange={(slot) =>
-                            handleTimeChange("saturday", slot)
-                          }
+                          handleChange={(slot) => handleTimeChange("saturday", slot)}
                           className="!w-fit !sm:w-[200px] border border-muted-foreground"
                         />
                       </div>
@@ -262,9 +246,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                           sat={false}
                           sun={true}
                           value={selectedSlots.sundayDate}
-                          onChange={(date) =>
-                            handleDateChange("sunday", date)
-                          }
+                          onChange={(date) => handleDateChange("sunday", date)}
                           className="w-auto flex-1"
                         />
                         <DropdownFilter
@@ -272,9 +254,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                           filterValues={timeSlots}
                           defaultValue="00:00 AM"
                           value={selectedSlots.sundayTime}
-                          handleChange={(slot) =>
-                            handleTimeChange("sunday", slot)
-                          }
+                          handleChange={(slot) => handleTimeChange("sunday", slot)}
                           className="!w-fit !sm:w-12 border border-muted-foreground"
                         />
                       </div>
@@ -302,6 +282,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                       }
                     />
                   </div>
+
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium pl-2">End Date</label>
                     <Input
@@ -315,6 +296,8 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                       }
                     />
                   </div>
+
+                  <Calendar />
                 </div>
               </div>
             </>

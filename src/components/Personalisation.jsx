@@ -111,7 +111,7 @@ const Personalisation = ({ open, onOpenChange, nickname, setNickname, themes, cu
               {weekendVibes?.map((vibe, index) => (
                 <Badge
                   variant="outline"
-                  // className="flex items-center gap-2 p-2 rounded-lg border border-muted-foreground/40"
+                  className="text-sm md:text-xs"
                   key={index}
                 >
                   {/* <span className="rounded-full" style={{backgroundColor : theme.primary}}></span> */}
@@ -119,7 +119,7 @@ const Personalisation = ({ open, onOpenChange, nickname, setNickname, themes, cu
                                 style={{ backgroundColor: theme.primary, width: 22, height: 22, borderRadius: 50, border: '1px solid #ccc' }}
                                 title={theme.name}
                             /> */}
-                  {vibe}
+                  {vibe.charAt(0).toUpperCase() + vibe.slice(1)}
                 </Badge>
               ))}
             </div>

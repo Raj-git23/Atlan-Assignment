@@ -10,7 +10,7 @@ const UnscheduledActivity = ({
   onDragStart, 
   onDragEnd, 
   onUnscheduleDrop,
-  onRemoveActivity 
+  onRemoveActivity = () => {}
 }) => {
   const unscheduledActivities = getUnscheduledActivities();
   

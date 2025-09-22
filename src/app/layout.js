@@ -8,11 +8,11 @@ import "./globals.css";
 
 export default function RootLayout({ children }) {
 
-  const { hydrate } = useActivityStore();
+  // const { hydrate } = useActivityStore();
 
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+  // useEffect(() => {
+  //   hydrate();
+  // }, [hydrate]);
 
 
   return (

@@ -10,11 +10,12 @@ import { Button } from '../ui/button'
 import { Switch } from '../ui/switch'
 import LongWeekendPanel from './Longweek'
 import { Input } from '../ui/input'
+import { getUpcomingDay } from '../helper'
 
 const Scheduled = () => {
 
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [activityId, setActivityId] = React.useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [activityId, setActivityId] = useState(null);
   const {
     scheduledActivities,
     selectedActivities,
@@ -38,6 +39,14 @@ const Scheduled = () => {
     endDate: "",
   });
 
+  const [weekendDate, setWeekendDate] = useState({
+    saturdayDate: getUpcomingDay("saturday"),
+    sundayDate: getUpcomingDay("sunday")
+  });
+
+  const handleWeekendDateChange = (day, date) => {
+    setWeekendDate((prev) => ({...prev, [`${day}Date`]: date}));
+  }
 
   // Drag and drop handlers
   const handleDragStart = (e, activity) => {
@@ -49,9 +58,9 @@ const Scheduled = () => {
     clearDragState();
   };
 
-  const handleDragOver = (e, day) => {
+  const handleDragOver = (e, day, date = null) => {
     e.preventDefault();
-    setDragOverDay(day);
+    setDragOverDay(day, date);
   };
 
   const handleDragLeave = () => {
@@ -67,14 +76,15 @@ const Scheduled = () => {
     if (longWeekendMode) {
       scheduleActivity({
         activity: draggedActivity,
-        day: "dateRange",
+        day: "daterange",
         time: "",
         date: "",
         dateRange,
+        type: "range"
       });
     } else {
       // Normal Sat/Sun
-      scheduleActivity({ activity: draggedActivity, day, date });
+      scheduleActivity({ activity: draggedActivity, day, date, time: "00:00 AM", type: "single" });
     }
 
     clearDragState();
@@ -116,6 +126,7 @@ const Scheduled = () => {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
             onUnscheduleDrop={handleUnscheduleDrop}
+            onRemoveActivity={handleRemoveActivity}   
           />
         )}
 
@@ -152,14 +163,14 @@ const Scheduled = () => {
               <LongWeekendPanel
                 weekendDay="Long Weekend"
                 scheduledActivities={scheduledActivities}
-                onDragOver={(e) => handleDragOver(e, "dateRange")}
+                onDragOver={(e) => handleDragOver(e, "daterange")}
                 onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, "dateRange", "")}
+                onDrop={(e) => handleDrop(e, "daterange", "")}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onRemoveActivity={handleRemoveActivity}
                 dragOverDay={dragOverDay}
-                isDropTarget={dragOverDay === "dateRange"}
+                isDropTarget={dragOverDay === "daterange"}
               />
             </div>
           ) : (
@@ -167,27 +178,31 @@ const Scheduled = () => {
               <WeekendPanel
                 weekendDay="Saturday"
                 scheduledActivities={scheduledActivities}
-                onDragOver={(e) => handleDragOver(e, "saturday")}
+                onDragOver={(e) => handleDragOver(e, "saturday", weekendDate?.saturdayDate)}
                 onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, "saturday", "")}
+                onDrop={(e) => handleDrop(e, "saturday", weekendDate?.saturdayDate)}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onRemoveActivity={handleRemoveActivity}
                 dragOverDay={dragOverDay}
                 isDropTarget={dragOverDay === "saturday"}
+                dateValue={weekendDate?.saturdayDate}
+                onDateValueChange={(date) => handleWeekendDateChange("saturday", date)}
               />
 
               <WeekendPanel
                 weekendDay="Sunday"
                 scheduledActivities={scheduledActivities}
-                onDragOver={(e) => handleDragOver(e, "sunday")}
+                onDragOver={(e) => handleDragOver(e, "sunday", weekendDate?.sundayDate)}
                 onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, "sunday", "")}
+                onDrop={(e) => handleDrop(e, "sunday", weekendDate?.sundayDate)}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onRemoveActivity={handleRemoveActivity}
                 dragOverDay={dragOverDay}
                 isDropTarget={dragOverDay === "sunday"}
+                dateValue={weekendDate?.sundayDate}
+                onDateValueChange={(date) => handleWeekendDateChange("sunday", date)}
               />
             </>
           )}

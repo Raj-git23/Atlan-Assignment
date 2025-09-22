@@ -23,7 +23,7 @@ const DropdownFilter = ({
       <SelectTrigger
         className={`${className} w-[150px] px-1.5 py-0 h-fit transition-colors ${
           isActive
-            ? "bg-accent border-accent-foreground text-accent-foreground" // active state
+            ? "border-2 border-accent/40 text-accent font-semibold  " // active state
             : "bg-muted/20 border-muted-foreground/20 text-muted-foreground" // default
         }`}
       >

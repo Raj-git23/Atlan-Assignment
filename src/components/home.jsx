@@ -12,24 +12,6 @@ import { useTheme } from "@/lib/ThemeContext";
 const Home = () => {
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const { selectedActivities } = useActivityStore();
-  const [showScroll, setShowScroll] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 200) {
-        setShowScroll(true);
-      } else {
-        setShowScroll(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   return (
     <>
@@ -103,15 +85,7 @@ const Home = () => {
         </TabsContent>
       </Tabs>
 
-      {showScroll && (
-        <Button
-          variant="outline"
-          onClick={scrollToTop}
-          className="mx-auto fixed bottom-12 border border-accent-foreground z-50 right-6 hover:scale-105 rounded-full transition-all duration-200 hover:cursor-pointer px-2 py-3 w-auto h-auto"
-        >
-          <ArrowUp size={60} />
-        </Button>
-      )}
+
     </>
   );
 };

@@ -12,6 +12,7 @@ import { Badge } from "../ui/badge";
 import DropdownOption from "./dropdown-option";
 import * as LucideIcons from "lucide-react";
 import SatSunDropdown from "../plannedSatSunDropdown";
+import { getUpcomingDay } from "../helper";
 
 const WeekendPanel = ({
   weekendDay,
@@ -24,14 +25,15 @@ const WeekendPanel = ({
   onRemoveActivity,
   dragOverDay,
   isDropTarget,
+  dateValue,
+  onDateValueChange
 }) => {
-  const [day, setDay] = useState('')
+  // const [day, setDay] = useState('')
+
 
   // Get activities for this specific day
   const dayActivities = scheduledActivities.filter(
-    (scheduledActivity) =>
-      scheduledActivity.day &&
-      scheduledActivity.day.toLowerCase() === weekendDay.toLowerCase()
+    (scheduledActivity) => scheduledActivity?.date && scheduledActivity?.date === dateValue
   );
 
 
@@ -45,7 +47,7 @@ const WeekendPanel = ({
   const handleDrop = (e) => {
     e.preventDefault();
     if (onDrop) {
-      onDrop(e, weekendDay.toLowerCase(), day);
+      onDrop(e, weekendDay.toLowerCase(), dateValue);
     }
   };
 
@@ -63,19 +65,21 @@ const WeekendPanel = ({
         <CardHeader className="">
           <CardTitle className="flex items-center gap-2 mb-1">
             <div className="flex justify-between w-full">
-              <span className="flex items-center ms-1 gap-2 ">
-                <Calendar className="w-5 h-5" /> {weekendDay}
-              </span>
+
+              <div className="flex items-center gap-4 w-auto">
+                <span className="flex items-center ms-1 gap-2 "> <Calendar className="w-5 h-5" /> {weekendDay} </span>
+                {isDropTarget && (<Badge variant="default" className="text-xs bg-primary/20 ml-auto text-primary border-primary/20"> Drop Here </Badge>)}
+              </div>
+
+
               <SatSunDropdown
                 sat={weekendDay == "Saturday" ? true : false}
                 sun={weekendDay == "Sunday" ? true : false}
-                // value={selectedSlots.saturdayDate}
-                onChange={(date) => setDay(date)
-                }
+                value={dateValue}
+                onChange={onDateValueChange}
+                className="border-0 text-secondary-foreground/80 space-x-2 flex"
               />
             </div>
-
-            {isDropTarget && (<Badge variant="default" className="text-xs bg-primary/20 ml-auto text-primary border-primary/20"> Drop Here </Badge>)}
 
           </CardTitle>
 
@@ -87,10 +91,9 @@ const WeekendPanel = ({
         </CardHeader>
 
         <CardContent
-          className={`flex-1 mx-4 mb-4 bg-secondary/20 transition-all duration-300 p-6 pr-8 rounded-lg border-2 border-dashed flex flex-col ${isDropTarget
-            ? "border-primary bg-primary/10 scale-[1.02] shadow-lg"
-            : "border-muted hover:border-primary/50"
-            } animate-in fade-in slide-in-from-bottom-4`}
+          className={`flex-1 mx-4 mb-4 bg-secondary/20 transition-all duration-300 p-6 pr-8 rounded-lg border-2 border-dashed flex flex-col 
+            ${isDropTarget ? "border-primary bg-primary/10 scale-[1.02] shadow-lg" : "border-muted hover:border-primary/50"} 
+            animate-in fade-in slide-in-from-bottom-4`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -127,10 +130,10 @@ const WeekendPanel = ({
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm"> {scheduledActivity.activity.name} </h4>
+                      <h4 className="font-medium text-sm"> {scheduledActivity?.activity?.name} </h4>
 
                       <p className="text-xs text-muted-foreground">
-                        {scheduledActivity.activity.duration} • {scheduledActivity.activity.price}
+                        {scheduledActivity?.activity?.duration} • {scheduledActivity?.activity?.price} {scheduledActivity?.time && `• ${scheduledActivity?.time}`}
                       </p>
                     </div>
                     {onRemoveActivity && (
