@@ -10,27 +10,13 @@ import { Button } from '../ui/button'
 import { Switch } from '../ui/switch'
 import LongWeekendPanel from './Longweek'
 import { Input } from '../ui/input'
-import { getUpcomingDay } from '../helper'
+import { getDateWithActivity, getUpcomingDay } from '../helper'
 
 const Scheduled = () => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [activityId, setActivityId] = useState(null);
-  const {
-    scheduledActivities,
-    selectedActivities,
-    draggedActivity,
-    dragOverDay,
-    scheduleActivity,
-    unscheduleActivity,
-    removeActivity,
-    addActivity,
-    setDraggedActivity,
-    setDragOverDay,
-    clearDragState,
-    getUnscheduledActivities,
-    getScheduledActivitiesForDay,
-  } = useActivityStore();
+  const { scheduledActivities, selectedActivities, draggedActivity, dragOverDay, scheduleActivity, unscheduleActivity, removeActivity, addActivity, setDraggedActivity, setDragOverDay, clearDragState, getUnscheduledActivities, getScheduledActivitiesForDay, } = useActivityStore();
 
 
   const [longWeekendMode, setLongWeekendMode] = useState(false);
@@ -39,9 +25,10 @@ const Scheduled = () => {
     endDate: "",
   });
 
+
   const [weekendDate, setWeekendDate] = useState({
-    saturdayDate: getUpcomingDay("saturday"),
-    sundayDate: getUpcomingDay("sunday")
+    saturdayDate: getDateWithActivity("saturday", scheduledActivities) || getUpcomingDay("saturday"),
+    sundayDate: getDateWithActivity("sunday", scheduledActivities) || getUpcomingDay("sunday")
   });
 
   const handleWeekendDateChange = (day, date) => {

@@ -32,9 +32,7 @@ const WeekendPanel = ({
 
 
   // Get activities for this specific day
-  const dayActivities = scheduledActivities.filter(
-    (scheduledActivity) => scheduledActivity?.date && scheduledActivity?.date === dateValue
-  );
+  const dayActivities = scheduledActivities.filter((scheduledActivity) => scheduledActivity?.date && scheduledActivity?.date === dateValue);
 
 
   const handleDragOver = (e) => {
@@ -60,7 +58,7 @@ const WeekendPanel = ({
   };
 
   return (
-    <main className="w-full h-96">
+    <main className="w-full h-[400px]">
       <Card className="hover:shadow-lg transition-all duration-300 h-full flex flex-col">
         <CardHeader className="">
           <CardTitle className="flex items-center gap-2 mb-1">
@@ -91,7 +89,7 @@ const WeekendPanel = ({
         </CardHeader>
 
         <CardContent
-          className={`flex-1 mx-4 mb-4 bg-secondary/20 transition-all duration-300 p-6 pr-8 rounded-lg border-2 border-dashed flex flex-col 
+          className={`flex-1 overflow-auto mx-4 mb-4 bg-secondary/20 transition-all duration-300 p-6 pr-8 rounded-lg border-2 border-dashed flex flex-col 
             ${isDropTarget ? "border-primary bg-primary/10 scale-[1.02] shadow-lg" : "border-muted hover:border-primary/50"} 
             animate-in fade-in slide-in-from-bottom-4`}
           onDragOver={handleDragOver}
@@ -120,7 +118,7 @@ const WeekendPanel = ({
                       onDragStart && onDragStart(e, scheduledActivity.activity)
                     }
                     onDragEnd={onDragEnd}
-                    className="flex items-center gap-3 p-3 bg-background border rounded-lg cursor-move transition-all duration-300 flex-shrink-0 hover:shadow-md hover:rotate-0.5 hover:translate-x-0.5 hover:translate-y-0.5"
+                    className="flex items-center gap-3 p-3 bg-background border rounded-lg cursor-move transition-all duration-300 flex-shrink-0 hover:shadow-md"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <GripVertical className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-200" />

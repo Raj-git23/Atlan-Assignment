@@ -6,14 +6,12 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "./ui/calendar";
 
-const DateDropdown = () => {
+const DateDropdown = ({mode = "single"}) => {
   return (
-    <Popover className="p-0">
-      <PopoverTrigger>
-        <p className="bg-secondary/40 px-2 py-1 rounded-lg border-2 border-foreground/20"> Select Date </p>
-      </PopoverTrigger>
+    <Popover className="p-0 ml-auto">
+      <PopoverTrigger className="bg-secondary/40 h-fit w-full whitespace-nowrap rounded-md px-4 text-foreground/80 py-1 border-2 border-foreground/20"> Select Date </PopoverTrigger>
       <PopoverContent className={"w-full h-fit p-1"}>
-        <Calendar className="text-sm w-full" classNames="text-sm w-full" />
+        <Calendar mode={mode} className="text-sm w-full" classNames="text-sm w-full" />
       </PopoverContent>
     </Popover>
   );

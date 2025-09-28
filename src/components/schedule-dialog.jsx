@@ -17,6 +17,10 @@ import SatSunDropdown from "./plannedSatSunDropdown";
 import { Input } from "@/components/ui/input"; 
 import * as LucideIcons from "lucide-react";
 import { Calendar, CalendarDayButton } from "./ui/calendar";
+import { Badge } from "./ui/badge";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
+import DateDropdown from "./date-dropdown";
 
 const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
   const ActivityIcon = LucideIcons[activity?.icon];
@@ -153,22 +157,25 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
             <ActivityIcon className="w-5 h-5 text-primary" />
           </DialogTitle>
 
-          <DialogDescription className="flex flex-col leading-tight text-left">
-            <span className="font-semibold text-xl text-primary">
-              {activity?.name}
-            </span>
+          <div className="flex flex-col leading-tight text-left">
+            <div className="flex items-center gap-4">
+              <p className="font-semibold text-xl text-primary">{activity?.name}</p>
+              
+              <div className="flex items-center justify-center gap-3">
+                <Badge className={`bg-secondary/90 text-secondary-foreground/80`}>{activity?.price}</Badge>
+                <Badge className={`${categoryColors[activity?.category]}`}>{activity?.duration}</Badge>
+                <Badge className={`${moodColors[activity?.mood]}`}>{activity?.mood.charAt(0).toUpperCase() + activity?.mood.slice(1)}</Badge>       
+              </div>
+            </div>
             <span className="text-sm text-muted-foreground/80">
               {activity?.description}
             </span>
-          </DialogDescription>
+          </div>
         </DialogHeader>
 
         {/* Error box */}
-        {error && (
-          <div className="text-sm text-red-500 bg-red-50 border border-red-200 p-4 rounded-md mt-2">
-            {error}
-          </div>
-        )}
+        {error && (<div className="text-sm text-red-500 bg-red-50 border border-red-200 p-4 rounded-md mt-2">{error}</div>)}
+
 
         {/* Toggle between Weekend vs Date Range */}
         <div className="flex items-center justify-between bg-secondary/20 p-3 rounded-lg mt-4">
@@ -177,7 +184,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
           <Switch checked={useDateRange} onCheckedChange={setUseDateRange} />
         </div>
 
-        <div className="space-y-4 my-4">
+        <div className="space-y-4 my-2">
           {!useDateRange ? (
             <>
               {/* Weekend Selection Flow */}
@@ -187,7 +194,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                   {/* Saturday */}
                   <div
                     onClick={() => handleDayToggle("saturday")}
-                    className={`relative p-4 h-32 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
+                    className={`relative p-4 h-28 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
                       ${selectedDays.includes("saturday") ? "bg-primary/10 border-primary shadow-md" : "bg-secondary/10 border-secondary hover:bg-secondary/30" }`}
                   >
                     <div className="flex flex-col text-center">
@@ -201,7 +208,7 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                   {/* Sunday */}
                   <div
                     onClick={() => handleDayToggle("sunday")}
-                    className={`relative p-4 h-32 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
+                    className={`relative p-4 h-28 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
                       ${selectedDays.includes("sunday") ? "bg-primary/10 border-primary shadow-md" : "bg-secondary/10 border-secondary hover:bg-secondary/30" }`}
                   >
                     <div className="flex flex-col text-center">
@@ -298,46 +305,34 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
                   </div>
 
                   {/* <Calendar /> */}
+                  <DateDropdown />
                 </div>
               </div>
             </>
           )}
 
           {/* Activity Details (same as before) */}
-          <div className="p-4 bg-secondary/20 rounded-lg space-y-2">
-            <div className="flex items-center justify-around gap-4 text-sm text-gray-600">
-              <span className="text-center space-y-1.5">
-                <p
-                  className={`px-4 py-3 ${moodColors[activity?.duration]} w-fit bg-blue-200 font-semibold text-base rounded-xl`}
-                >
-                  {activity?.duration}
-                </p>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Duration
-                </p>
-              </span>
-              <span className="text-center space-y-1.5">
-                <p
-                  className={`px-4 py-3 ${categoryColors[activity?.category]} w-fit bg-green-200 font-semibold text-base rounded-xl`}
-                >
-                  {activity?.price}
-                </p>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Price
-                </p>
-              </span>
-              <span className="text-center space-y-1.5">
-                <p
-                  className={`px-4 py-3 ${moodColors[activity?.mood]} w-fit bg-purple-200 font-semibold text-base rounded-xl`}
-                >
-                  {activity?.mood.charAt(0).toUpperCase() +
-                    activity?.mood.slice(1)}
-                </p>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Mood
-                </p>
-              </span>
-            </div>
+          {/* <div className="flex items-center justify-around gap-4 p-4 bg-secondary/20 rounded-lg text-sm text-gray-600">
+            <span className="text-center space-y-1.5">
+              <p className={`px-4 py-3 ${moodColors[activity?.duration]} w-fit bg-blue-200 font-semibold text-base rounded-xl`}>{activity?.duration}</p>
+              <p className="text-sm font-medium text-muted-foreground">Duration</p>
+            </span>
+            
+            <span className="text-center space-y-1.5">
+              <p className={`px-4 py-3 ${categoryColors[activity?.category]} w-fit bg-green-200 font-semibold text-base rounded-xl`}>{activity?.price}</p>
+              <p className="text-sm font-medium text-muted-foreground">Price</p>
+            </span>
+
+            <span className="text-center space-y-1.5">
+              <p className={`px-4 py-3 ${moodColors[activity?.mood]} w-fit bg-purple-200 font-semibold text-base rounded-xl`}>{activity?.mood.charAt(0).toUpperCase() + activity?.mood.slice(1)}</p>
+              <p className="text-sm font-medium text-muted-foreground">Mood</p>
+            </span>
+
+          </div> */}
+
+          <div className="grid w-full gap-3">
+            <Label htmlFor="message">Description (Optional)</Label>
+            <Textarea placeholder="Add any special notes, preferences, or details about this activity.." id="message" className="placeholder:text-muted-foreground/70 text-gray-800 h-28"/>
           </div>
         </div>
 
@@ -351,14 +346,8 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
             disabled={
               (!useDateRange &&
                 (selectedDays.length === 0 ||
-                  selectedDays.some(
-                    (d) =>
-                      !selectedSlots[`${d}Date`] ||
-                      !selectedSlots[`${d}Time`] ||
-                      selectedSlots[`${d}Time`] === "00:00 AM"
-                  ))) ||
-              (useDateRange && (!dateRange.startDate || !dateRange.endDate))
-            }
+                  selectedDays.some((d) => !selectedSlots[`${d}Date`] || !selectedSlots[`${d}Time`] || selectedSlots[`${d}Time`] === "00:00 AM"))) 
+                  || (useDateRange && (!dateRange.startDate || !dateRange.endDate))}
             className="min-w-[120px]"
           >
             Schedule Activity

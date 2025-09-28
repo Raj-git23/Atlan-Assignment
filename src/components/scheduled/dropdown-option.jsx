@@ -24,7 +24,7 @@ const DropdownOption = ({onRemoveActivity, activityId}) => {
         <DropdownMenuTrigger asChild>
           <Button
             size="sm"
-            variant="ghost"
+            variant="linkActive"
             className="opacity-100 group-hover:opacity-100 hover:cursor-pointer transition-all duration-200 hover:scale-105"
           >
             <EllipsisVertical className="w-4 h-4" />
