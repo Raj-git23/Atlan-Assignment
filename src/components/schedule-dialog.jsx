@@ -16,23 +16,31 @@ import DropdownFilter from "./dropdownfilter";
 import SatSunDropdown from "./plannedSatSunDropdown";
 import { Input } from "@/components/ui/input"; 
 import * as LucideIcons from "lucide-react";
+import {UserPlus, Search, X as Cross} from "lucide-react";
 import { Calendar, CalendarDayButton } from "./ui/calendar";
 import { Badge } from "./ui/badge";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import DateDropdown from "./date-dropdown";
+import AddPeopleDialog from "./add-people-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
-const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
+
+const ScheduleDialog = ({ open, setOpen, activity, day = [], date = "", time = "", description = "", people = [] }) => {
+  
   const ActivityIcon = LucideIcons[activity?.icon];
   const [error, setError] = useState("");
+  const [descriptionText, setDescriptionText] = useState(description || "");
+  const [openAddPeople, setOpenAddPeople] = useState(false);
+  const [emailList, setEmailList] = useState(people || []);
 
   // Normal weekend flow
   const [selectedDays, setSelectedDays] = useState(Array.isArray(day) ? day : []);
   const [selectedSlots, setSelectedSlots] = useState({
-    saturdayDate: "",
-    saturdayTime: "00:00 AM",
-    sundayDate: "",
-    sundayTime: "00:00 AM"
+    saturdayDate: day.includes("saturday") ? date || "" : "",
+    saturdayTime: day.includes("saturday") ? time || "00:00 AM" : "00:00 AM",
+    sundayDate: day.includes("sunday") ? date || "" : "",
+    sundayTime: day.includes("sunday") ? time || "00:00 AM" : "00:00 AM"
   });
 
   // New toggle & date range flow
@@ -79,6 +87,8 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
         date: "",
         dateRange, // pass startDate & endDate
         type: useDateRange ? "range" : "single",    // Identify long or single weekend
+        description: descriptionText,
+        people: emailList,
       });
 
     } else {        // for weekends only
@@ -97,13 +107,13 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
           return;
         }
 
-        const dayActivities = getScheduledActivitiesForDay(d);
-        const isAlreadyScheduled = dayActivities.some((sa) => sa.activity?.id === activity?.id);
+        // const dayActivities = getScheduledActivitiesForDay(d);
+        // const isAlreadyScheduled = dayActivities.some((sa) => sa.activity?.id === activity?.id);
         
-        if (isAlreadyScheduled) {
-          setError(`Activity is already scheduled for ${d}`);
-          return;
-        }
+        // if (isAlreadyScheduled) {
+        //   setError(`Activity is already scheduled for ${d}`);
+        //   return;
+        // }
       }
 
       addActivity(activity);
@@ -115,6 +125,8 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
           time: selectedSlots[`${d}Time`],
           date: selectedSlots[`${d}Date`],
           type: useDateRange ? "range" : "single",    // Identify long or single weekend
+          description: descriptionText,
+          people: emailList,
         });
       });
     }
@@ -143,218 +155,189 @@ const ScheduleDialog = ({ open, setOpen, activity, day = [], time = "" }) => {
       sundayTime: "00:00 AM"
     });
     setDateRange({ startDate: "", endDate: "" });
+    setDescriptionText("");
     setError("");
   };
-
+  
   const saturdayCount = getScheduledActivitiesForDay("saturday").length;
   const sundayCount = getScheduledActivitiesForDay("sunday").length;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="w-full">
-        <DialogHeader className="flex flex-row items-center gap-3 text-lg font-semibold">
-          <DialogTitle className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center hover:bg-primary/20 transition-all duration-200 hover:scale-110">
-            <ActivityIcon className="w-5 h-5 text-primary" />
-          </DialogTitle>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="w-[450px] h-auto max-h-[90vh] p-4 sm:p-6 overflow-y-auto">
+          <DialogHeader className="flex flex-row items-center gap-3 text-lg font-semibold">
+            <DialogTitle className="w-auto h-auto p-2 bg-primary/10 rounded-lg flex items-center justify-center hover:bg-primary/20 transition-all duration-200 hover:scale-110">
+              <ActivityIcon className="w-6 sm:w-7 h-6 sm:h-7 text-primary" />
+            </DialogTitle>
 
-          <div className="flex flex-col leading-tight text-left">
-            <div className="flex items-center gap-4">
-              <p className="font-semibold text-xl text-primary">{activity?.name}</p>
-              
-              <div className="flex items-center justify-center gap-3">
-                <Badge className={`bg-secondary/90 text-secondary-foreground/80`}>{activity?.price}</Badge>
-                <Badge className={`${categoryColors[activity?.category]}`}>{activity?.duration}</Badge>
-                <Badge className={`${moodColors[activity?.mood]}`}>{activity?.mood.charAt(0).toUpperCase() + activity?.mood.slice(1)}</Badge>       
+            <div className="flex flex-col leading-tight text-left">
+              <div className="flex items-center gap-4">
+                <p className="font-bold text-lg sm:text-xl text-primary">{activity?.name}</p>
+                
+                <div className="flex items-center justify-center gap-3">
+                  <Badge className={`bg-secondary/90 text-secondary-foreground/80`}>{activity?.price}</Badge>
+                  <Badge className={`${categoryColors[activity?.category]}`}>{activity?.duration}</Badge>
+                  <Badge className={`${moodColors[activity?.mood]}`}>{activity?.mood.charAt(0).toUpperCase() + activity?.mood.slice(1)}</Badge>       
+                </div>
               </div>
+
+              <p className="text-[13px] sm:text-sm text-muted-foreground/80"> {activity?.description} </p>
             </div>
-            <span className="text-sm text-muted-foreground/80">
-              {activity?.description}
-            </span>
-          </div>
-        </DialogHeader>
+          </DialogHeader>
 
-        {/* Error box */}
-        {error && (<div className="text-sm text-red-500 bg-red-50 border border-red-200 p-4 rounded-md mt-2">{error}</div>)}
+          {/* Error box */}
+          {error && (<div className="text-sm text-red-500 bg-red-50 border border-red-200 p-4 rounded-md mt-2">{error}</div>)}
+
+          <AddPeopleDialog open={openAddPeople} setOpen={setOpenAddPeople} emailList={emailList} setEmailList={setEmailList} />
 
 
-        {/* Toggle between Weekend vs Date Range */}
-        <div className="flex items-center justify-between bg-secondary/20 p-3 rounded-lg mt-4">
-          <span className="font-medium">Plan a Long Weekend</span>
+          <Tabs defaultValue="single" value={useDateRange ? "range" : "single"} onValueChange={(value) => setUseDateRange(value === "range")} className="flex items-center gap-2 justify-center w-full mx-auto">
+            <TabsList className="bg-secondary/40 h-auto w-full text-center">
+              <TabsTrigger value="single" className="w-full h-auto py-2 data-[state=active]:font-semibold text-sm">Select Days</TabsTrigger>
+              <TabsTrigger value="range" className="w-full h-auto py-2 data-[state=active]:font-semibold text-sm">Long Weekend</TabsTrigger>
+            </TabsList>
 
-          <Switch checked={useDateRange} onCheckedChange={setUseDateRange} />
-        </div>
+          
+            <TabsContent value="single" className="w-full">
+              <div className="space-y-4 my-2">
 
-        <div className="space-y-4 my-2">
-          {!useDateRange ? (
-            <>
-              {/* Weekend Selection Flow */}
-              <div className="space-y-3">
-                <p className="font-semibold text-gray-800"> Choose day(s) for this activity: </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Saturday */}
-                  <div
-                    onClick={() => handleDayToggle("saturday")}
-                    className={`relative p-4 h-28 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
-                      ${selectedDays.includes("saturday") ? "bg-primary/10 border-primary shadow-md" : "bg-secondary/10 border-secondary hover:bg-secondary/30" }`}
-                  >
-                    <div className="flex flex-col text-center">
-                      <span className="font-semibold text-lg">Saturday</span>
-                      <span className="text-sm text-secondary-foreground/80">
-                        {saturdayCount} {saturdayCount === 1 ? "activity" : "activities"} planned
-                      </span>
+                {/* Weekend Selection Flow */}
+                <div className="space-y-3">
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Saturday */}
+                    <div
+                      onClick={() => handleDayToggle("saturday")}
+                      className={`relative p-4 h-16 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
+                        ${selectedDays.includes("saturday") ? "bg-primary/5 border-primary/30 shadow-md" : "bg-muted/10 border hover:bg-muted/30" }`}
+                    >
+                      <div className="flex flex-col text-center gap-0.5">
+                        <span className="font-semibold text-sm">Saturday</span>
+                        <span className="text-xs text-secondary-foreground/80"> {saturdayCount} {saturdayCount === 1 ? "activity" : "activities"} </span>
+                      </div>
+                    </div>
+
+                    {/* Sunday */}
+                    <div
+                      onClick={() => handleDayToggle("sunday")}
+                      className={`relative p-4 h-16 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
+                        ${selectedDays.includes("sunday") ? "bg-primary/5 border-primary/30 shadow-md" : "bg-muted/10 border hover:bg-muted/30" }`}
+                    >
+                      <div className="flex flex-col text-center gap-0.5">
+                        <span className="font-semibold text-sm">Sunday</span>
+                        <span className="text-xs text-secondary-foreground/80"> {sundayCount} {sundayCount === 1 ? "activity" : "activities"} </span>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Sunday */}
-                  <div
-                    onClick={() => handleDayToggle("sunday")}
-                    className={`relative p-4 h-28 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] 
-                      ${selectedDays.includes("sunday") ? "bg-primary/10 border-primary shadow-md" : "bg-secondary/10 border-secondary hover:bg-secondary/30" }`}
-                  >
-                    <div className="flex flex-col text-center">
-                      <span className="font-semibold text-lg">Sunday</span>
-                      <span className="text-sm text-secondary-foreground/80">
-                        {sundayCount} {sundayCount === 1 ? "activity" : "activities"} planned
-                      </span>
-                    </div>
-                  </div>
+                
                 </div>
-              </div>
 
-              {/* Slot dropdowns */}
-              {selectedDays.length > 0 && (
-                <div className="flex flex-col gap-3 p-4 bg-secondary/20 rounded-lg">
-                  <p className="font-medium">Select Date & Slot(s)</p>
-                  <div className="flex flex-col gap-3">
+                {/* Slot dropdowns */}
+                {selectedDays.length > 0 && (
+                  <div className="flex flex-col gap-2 p-3 bg-secondary/20 border border-accent/30 rounded-lg">
+                    <p className="text-xs font-medium">Select Date & Slot(s)</p>
+                    <div className="flex flex-col gap-3">
+                      
+                      {selectedDays.includes("saturday") && (
+                        <div className="flex gap-3 items-center">
+                          <SatSunDropdown
+                            sat={true}
+                            sun={false}
+                            value={selectedSlots.saturdayDate}
+                            onChange={(date) => handleDateChange("saturday", date)}
+                            className="w-full flex-1 bg-muted"
+                          />
+                          <DropdownFilter
+                            filterLabel="Slots"
+                            filterValues={timeSlots}
+                            defaultValue="00:00 AM"
+                            value={selectedSlots.saturdayTime}
+                            handleChange={(slot) => handleTimeChange("saturday", slot)}
+                            className="w-full border border-muted-foreground"
+                          />
+                        </div>
+                      )}
+
+                      {selectedDays.includes("sunday") && (
+                        <div className="flex gap-3 items-center">
+                          <SatSunDropdown
+                            sat={false}
+                            sun={true}
+                            value={selectedSlots.sundayDate}
+                            onChange={(date) => handleDateChange("sunday", date)}
+                            className="w-full flex-1 bg-muted"
+                          />
+                          <DropdownFilter
+                            filterLabel="Slots"
+                            filterValues={timeSlots}
+                            defaultValue="00:00 AM"
+                            value={selectedSlots.sundayTime}
+                            handleChange={(slot) => handleTimeChange("sunday", slot)}
+                            className="w-full border border-muted-foreground"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+              
+            <TabsContent value="range" className="w-full mt-2 overflow-x-hidden">
+                {/* Date Range Flow */}
+                <div className="p-2 flex gap-2 justify-between bg-secondary/20 border border-accent/30 rounded-lg space-y-3 w-full">
+                  {/* <p className="font-semibold">Select Start & End Dates</p> */}
+                    <DateDropdown 
+                      date={dateRange.startDate} 
+                      setDate={(date) => setDateRange((prev) => ({...prev, startDate: date}))} 
+                      caption="Start Date"
+                      className="w-full"
+                    />
                     
-                    {selectedDays.includes("saturday") && (
-                      <div className="flex  gap-3 items-center">
-                        <SatSunDropdown
-                          sat={true}
-                          sun={false}
-                          value={selectedSlots.saturdayDate}
-                          onChange={(date) => handleDateChange("saturday", date)}
-                          className="w-auto flex-1"
-                        />
-                        <DropdownFilter
-                          filterLabel="Slots"
-                          filterValues={timeSlots}
-                          defaultValue="00:00 AM"
-                          value={selectedSlots.saturdayTime}
-                          handleChange={(slot) => handleTimeChange("saturday", slot)}
-                          className="!w-fit !sm:w-[200px] border border-muted-foreground"
-                        />
-                      </div>
-                    )}
-
-                    {selectedDays.includes("sunday") && (
-                      <div className="flex gap-3 items-center">
-                        <SatSunDropdown
-                          sat={false}
-                          sun={true}
-                          value={selectedSlots.sundayDate}
-                          onChange={(date) => handleDateChange("sunday", date)}
-                          className="w-auto flex-1"
-                        />
-                        <DropdownFilter
-                          filterLabel="Slots"
-                          filterValues={timeSlots}
-                          defaultValue="00:00 AM"
-                          value={selectedSlots.sundayTime}
-                          handleChange={(slot) => handleTimeChange("sunday", slot)}
-                          className="!w-fit !sm:w-12 border border-muted-foreground"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              {/* Date Range Flow */}
-              <div className="p-4 bg-secondary/20 rounded-lg space-y-3">
-                {/* <p className="font-semibold">Select Start & End Dates</p> */}
-                <div className="flex gap-4 justify-around px-2">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium pl-2">Start Date</label>
-                    <Input
-                      type="date"
-                      value={dateRange.startDate}
-                      onChange={(e) =>
-                        setDateRange((prev) => ({
-                          ...prev,
-                          startDate: e.target.value
-                        }))
-                      }
+                    <DateDropdown 
+                      date={dateRange.endDate} 
+                      setDate={(date) => setDateRange((prev) => ({...prev, endDate: date}))} 
+                      caption="End Date"
+                      className="w-full"
                     />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium pl-2">End Date</label>
-                    <Input
-                      type="date"
-                      value={dateRange.endDate}
-                      onChange={(e) =>
-                        setDateRange((prev) => ({
-                          ...prev,
-                          endDate: e.target.value
-                        }))
-                      }
-                    />
-                  </div>
-
-                  {/* <Calendar /> */}
-                  <DateDropdown />
                 </div>
-              </div>
-            </>
-          )}
+            </TabsContent>
+          </Tabs>
 
-          {/* Activity Details (same as before) */}
-          {/* <div className="flex items-center justify-around gap-4 p-4 bg-secondary/20 rounded-lg text-sm text-gray-600">
-            <span className="text-center space-y-1.5">
-              <p className={`px-4 py-3 ${moodColors[activity?.duration]} w-fit bg-blue-200 font-semibold text-base rounded-xl`}>{activity?.duration}</p>
-              <p className="text-sm font-medium text-muted-foreground">Duration</p>
-            </span>
-            
-            <span className="text-center space-y-1.5">
-              <p className={`px-4 py-3 ${categoryColors[activity?.category]} w-fit bg-green-200 font-semibold text-base rounded-xl`}>{activity?.price}</p>
-              <p className="text-sm font-medium text-muted-foreground">Price</p>
-            </span>
-
-            <span className="text-center space-y-1.5">
-              <p className={`px-4 py-3 ${moodColors[activity?.mood]} w-fit bg-purple-200 font-semibold text-base rounded-xl`}>{activity?.mood.charAt(0).toUpperCase() + activity?.mood.slice(1)}</p>
-              <p className="text-sm font-medium text-muted-foreground">Mood</p>
-            </span>
-
-          </div> */}
 
           <div className="grid w-full gap-3">
-            <Label htmlFor="message">Description (Optional)</Label>
-            <Textarea placeholder="Add any special notes, preferences, or details about this activity.." id="message" className="placeholder:text-muted-foreground/70 text-gray-800 h-28"/>
+            <Label htmlFor="message" className={"text-sm pl-1 text-foreground"}>Description (Optional)</Label>
+            <Textarea 
+              placeholder="Add any special notes, preferences, or details about this activity.." 
+              id="message" 
+              className="placeholder:text-muted-foreground/70 text-gray-800 h-28"
+              value={descriptionText}
+              onChange={(e) => setDescriptionText(e.target.value)}
+            />
           </div>
-        </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-end gap-3 mt-6">
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={
-              (!useDateRange &&
-                (selectedDays.length === 0 ||
-                  selectedDays.some((d) => !selectedSlots[`${d}Date`] || !selectedSlots[`${d}Time`] || selectedSlots[`${d}Time`] === "00:00 AM"))) 
-                  || (useDateRange && (!dateRange.startDate || !dateRange.endDate))}
-            className="min-w-[120px]"
-          >
-            Schedule Activity
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 mt-6">
+            <Button variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={
+                (!useDateRange &&
+                  (selectedDays.length === 0 || selectedDays.some((d) => !selectedSlots[`${d}Date`] || !selectedSlots[`${d}Time`] || selectedSlots[`${d}Time`] === "00:00 AM"))) 
+                    || (useDateRange && (!dateRange.startDate || !dateRange.endDate))}
+              className="min-w-[120px]"
+            >
+              Schedule Activity
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* {openAddPeople && (<AddPeopleDialog open={openAddPeople} setOpen={setOpenAddPeople} />)} */}
+    </>
   );
 };
 

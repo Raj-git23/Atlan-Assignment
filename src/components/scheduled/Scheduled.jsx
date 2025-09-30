@@ -11,19 +11,19 @@ import { Switch } from '../ui/switch'
 import LongWeekendPanel from './Longweek'
 import { Input } from '../ui/input'
 import { getDateWithActivity, getUpcomingDay } from '../helper'
+import AddPeopleDialog from '../add-people-dialog'
 
 const Scheduled = () => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [activityId, setActivityId] = useState(null);
+  const [peopleDialogActivity, setPeopleDialogActivity] = useState(null);
+
   const { scheduledActivities, selectedActivities, draggedActivity, dragOverDay, scheduleActivity, unscheduleActivity, removeActivity, addActivity, setDraggedActivity, setDragOverDay, clearDragState, getUnscheduledActivities, getScheduledActivitiesForDay, } = useActivityStore();
 
 
   const [longWeekendMode, setLongWeekendMode] = useState(false);
-  const [dateRange, setDateRange] = useState({
-    startDate: "",
-    endDate: "",
-  });
+  const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
 
   const [weekendDate, setWeekendDate] = useState({
@@ -94,6 +94,7 @@ const Scheduled = () => {
     clearDragState();
   };
 
+  console.log(peopleDialogActivity)
   return (
     <>
       <main className='flex flex-col items-center w-full mt-4 sm:mt-10 gap-4'>
@@ -117,7 +118,7 @@ const Scheduled = () => {
           />
         )}
 
-        <div className='flex flex-col min-[800px]:flex-row gap-4 h-auto my-5 w-full justify-center'>
+        <div className='flex flex-col min-[900px]:flex-row gap-4 h-auto my-5 w-full justify-center'>
           {longWeekendMode ? (
 
             <div className="flex flex-col gap-4 w-full">
@@ -175,6 +176,9 @@ const Scheduled = () => {
                 isDropTarget={dragOverDay === "saturday"}
                 dateValue={weekendDate?.saturdayDate}
                 onDateValueChange={(date) => handleWeekendDateChange("saturday", date)}
+                // openAddPeople={openAddPeople}
+                // setOpenAddPeople={setOpenAddPeople}
+                onOpenPeopleDialog={(activity) => setPeopleDialogActivity(activity)}
               />
 
               <WeekendPanel
@@ -190,6 +194,9 @@ const Scheduled = () => {
                 isDropTarget={dragOverDay === "sunday"}
                 dateValue={weekendDate?.sundayDate}
                 onDateValueChange={(date) => handleWeekendDateChange("sunday", date)}
+                // openAddPeople={openAddPeople}
+                // setOpenAddPeople={setOpenAddPeople}
+                onOpenPeopleDialog={(activity) => setPeopleDialogActivity(activity)}
               />
             </>
           )}
@@ -223,6 +230,33 @@ const Scheduled = () => {
           </DialogContent>
         </Dialog>
       )}
+
+
+      {peopleDialogActivity && (
+        <Dialog open={!!peopleDialogActivity} onOpenChange={() => setPeopleDialogActivity(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit People for this activity</DialogTitle>
+              <DialogDescription>Add or remove people from this activity</DialogDescription>
+            </DialogHeader>
+
+            <AddPeopleDialog
+              open
+              setOpen={() => setPeopleDialogActivity(null)}
+              emailList={peopleDialogActivity?.people}
+              setEmailList={(updatedList) => {
+                console.log(updatedList);
+                scheduleActivity({
+                  ...peopleDialogActivity,
+                  people: updatedList,
+                });
+                setPeopleDialogActivity(null);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
     </>
   )
 }

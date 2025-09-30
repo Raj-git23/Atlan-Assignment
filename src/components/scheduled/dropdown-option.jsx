@@ -15,20 +15,20 @@ import ScheduleDialog from "../schedule-dialog";
 const DropdownOption = ({onRemoveActivity, activityId}) => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const { scheduledActivities, selectedActivities } = useActivityStore();
-  const activity = scheduledActivities.find(item => item?.activity?.id === activityId) || selectedActivities.find((item) => item?.activity?.id === activityId);
+  const scheduledActivity = scheduledActivities.find(item => item?.activity?.id === activityId);
+  const selectedActivity = selectedActivities.find((item) => item?.id === activityId);
 
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            size="sm"
-            variant="linkActive"
-            className="opacity-100 group-hover:opacity-100 hover:cursor-pointer transition-all duration-200 hover:scale-105"
+          <button
+            type="button"
+            className="rounded-full p-2 hover:cursor-pointer hover:border hover:border-muted-foreground/50"
           >
             <EllipsisVertical className="w-4 h-4" />
-          </Button>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem 
@@ -53,9 +53,12 @@ const DropdownOption = ({onRemoveActivity, activityId}) => {
         <ScheduleDialog
           open={openDialog}
           setOpen={setOpenDialog}
-          activity={activity?.activity}
-          day={activity?.day}
-          time={activity?.time}
+          activity={scheduledActivity?.activity || selectedActivity}
+          day={[scheduledActivity?.day]}
+          date={scheduledActivity?.date}
+          time={scheduledActivity?.time}
+          description={scheduledActivity?.description}
+          people={scheduledActivity?.people || []}
         />
       )}
     </>

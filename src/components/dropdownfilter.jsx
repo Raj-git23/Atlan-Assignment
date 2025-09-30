@@ -21,10 +21,10 @@ const DropdownFilter = ({
   return (
     <Select onValueChange={handleChange} value={value} className="w-full !text-xs">
       <SelectTrigger
-        className={`${className} w-[150px] px-1.5 py-0 h-fit transition-colors ${
+        className={`${className} w-[150px] px-1.5 py-0 h-fit transition-colors bg-muted  ${
           isActive
-            ? "border-2 border-accent/40 text-accent font-semibold  " // active state
-            : "bg-muted/20 border-muted-foreground/20 text-muted-foreground" // default
+            ? "border-2 border-accent/40 text-accent font-semibold " // active state
+            : "border-muted-foreground/20 text-muted-foreground" // default
         }`}
       >
         <SelectValue placeholder={filterLabel} />

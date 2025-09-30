@@ -24,7 +24,7 @@ export default function SatSunDropdown({
 }) {
   const [dates, setDates] = useState([]);
   const [val, setVal] = useState(value ?? undefined);
-
+  
   useEffect(() => {
     const generateDates = () => {
       const days = [];
