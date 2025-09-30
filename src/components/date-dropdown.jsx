@@ -1,22 +1,54 @@
-import React from "react";
+"use client"
+
+import * as React from "react"
+import { ChevronDownIcon } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Label } from "@/components/ui/label"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "./ui/calendar";
+} from "@/components/ui/popover"
+import { format } from "date-fns/format"
 
-const DateDropdown = () => {
+export default function DateDropdown({date, setDate, caption, className}) {
+  const [open, setOpen] = React.useState(false)
+  
+  console.log(date)
   return (
-    <Popover className="p-0">
-      <PopoverTrigger>
-        <p className="bg-secondary/40 px-2 py-1 rounded-lg border-2 border-foreground/20"> Select Date </p>
-      </PopoverTrigger>
-      <PopoverContent className={"w-full h-fit p-1"}>
-        <Calendar className="text-sm w-full" classNames="text-sm w-full" />
-      </PopoverContent>
-    </Popover>
-  );
-};
-
-export default DateDropdown;
+    <div className={`flex flex-col gap-3 ${className}`}>
+      <Label htmlFor="date" className="px-1 text-xs">
+        {caption}
+      </Label>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            id="date"
+            className="w-full justify-between font-normal"
+          >
+            {date ? date.toLocaleDateString() : "Select date"}
+            <ChevronDownIcon />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={date}
+            captionLayout="dropdown"
+            onSelect={(date) => {
+              if(date){
+                const formattedDate = format(date, 'yyyy-MM-dd');
+                console.log(formattedDate)
+                setDate(date)
+                setOpen(false)
+              }
+            }}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
+}

@@ -12,7 +12,7 @@ const useActivityStore = create(
       dragOverDate: null,
 
       // Add or schedule activity
-      scheduleActivity: ({ activity, day, time = "", date = "", dateRange = null, type = "single", }) =>
+      scheduleActivity: ({ activity, day, time = "", date = "", dateRange = null, type = "single", description = "", people = [] }) =>
         set((state) => {
           // Remove duplicates
           const filteredSchedule = state.scheduledActivities.filter((sa) => {
@@ -29,7 +29,7 @@ const useActivityStore = create(
           return {
             scheduledActivities: [
               ...filteredSchedule,
-              { activity, day: day.toLowerCase(), time, date, dateRange, type },
+              { activity, day: day.toLowerCase(), time, date, dateRange, type, description, people },
             ],
 
             selectedActivities: state.selectedActivities.some( (a) => 

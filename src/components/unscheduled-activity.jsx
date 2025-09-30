@@ -37,7 +37,7 @@ const UnscheduledActivity = ({
         ) : (
           <div className="grid grid-cols-1 min-[500px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
             {unscheduledActivities.map((activity, index) => {
-              const ActivityIcon = LucideIcons[activity.icon];
+              const ActivityIcon = LucideIcons[activity?.icon];
               return (
                 <div
                   key={activity.id}

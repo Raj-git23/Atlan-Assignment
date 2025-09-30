@@ -63,7 +63,7 @@ const Navbar = () => {
   return (
     <>
       <main className="flex justify-between items-center px-3 sm:px-6 lg:px-20 py-4 border-b">
-        <div className="flex w-full gap-1 sm:gap-4 items-center">
+        <div className="flex w-full gap-2 sm:gap-4 items-center">
           {/* <picture className="h-16 w-16 overflow-hidden">
             <img
               src="/logo.png"

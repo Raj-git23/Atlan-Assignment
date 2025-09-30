@@ -28,6 +28,10 @@ export const getButtonVariant = ({ isScheduled, isInSelectedActivities }) => {
   }
 };
 
+export function getDateWithActivity (targetDay, scheduledActivities) {
+  const activity = scheduledActivities.find(activity => activity?.day === targetDay) || null;
+  return activity?.date;
+}
 
 export function getUpcomingDay(targetDay) {
   const today = new Date();
